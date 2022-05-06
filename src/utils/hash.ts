@@ -1,22 +1,11 @@
-import {
-    SHA256,
-    SHA512,
-    enc
-} from 'crypto-js'
-import { bytesToHex } from './helpers'
+import { TON3SHA256, TON3SHA512 } from 'swiftyjs'
 
 const sha256 = (bytes: Uint8Array): string => {
-    const hex = bytesToHex(bytes)
-    const words = enc.Hex.parse(hex)
-
-    return SHA256(words).toString()
+    return TON3SHA256(bytes)
 }
 
 const sha512 = (bytes: Uint8Array): string => {
-    const hex = bytesToHex(bytes)
-    const words = enc.Hex.parse(hex)
-
-    return SHA512(words).toString()
+    return TON3SHA512(bytes)
 }
 
 export {

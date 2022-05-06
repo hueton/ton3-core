@@ -7,20 +7,36 @@
             "ES2020",
             "ESNEXT"
         ],
-        "declaration": true,
+        "declaration": false,
         "removeComments": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "sourceMap": true,
+        "sourceMap": false,
         "outDir": "./dist",
         "baseUrl": "./src",
-        "incremental": true
+        "incremental": true,
+        "typeRoots": [ 
+            "./node_modules/@types",
+            "./@types"
+        ],
+        "types": [ 
+            "swiftyjs",
+            "node"
+        ],
+        "paths": {
+            "swiftyjs/*" : [ 
+              "../@types/swiftyjs/*",
+            ],
+            "swiftyjs" : [ 
+              "../@types/swiftyjs",
+            ],
+        },
     },
     "ts-node": {
         "transpileOnly": true
     },
     "include": ["./**/*.ts"],
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["node_modules", "dist", "@types"]
 }

@@ -1,7 +1,4 @@
-import {
-    TextEncoder,
-    TextDecoder
-} from 'util'
+import { TON3BytesToString, TON3StringToBytes } from 'swiftyjs'
 import { Bit } from '../types/bit'
 
 const isNodeEnv = typeof process === 'object' && process.title === 'node'
@@ -89,15 +86,11 @@ const bitsToInt8 = (bits: Bit[]): number => uint8toInt8(bytesToUint(bitsToBytes(
 const bytesToHex = (bytes: Uint8Array): string => bytes.reduce((acc, uint) => `${acc}${uintToHex(uint)}`, '')
 
 const bytesToString = (bytes: Uint8Array): string => {
-    const decoder = new TextDecoder()
-
-    return decoder.decode(bytes)
+    return TON3BytesToString(bytes)
 }
 
 const stringToBytes = (value: string): Uint8Array => {
-    const encoder = new TextEncoder()
-
-    return encoder.encode(value)
+    return TON3StringToBytes(value)
 }
 
 const bytesToBase64 = (data: Uint8Array | number[]): string => {
