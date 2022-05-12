@@ -4,7 +4,7 @@ import {
     bitsToHex,
     hexToBits
 } from '../utils/helpers'
-import { augment } from '../utils/bits'
+import { augment } from '../types/bit'
 import { sha256 } from '../utils/hash'
 
 class Cell {

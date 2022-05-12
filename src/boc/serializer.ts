@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { Bit } from '../types/bit'
 import { Cell } from './cell'
 import { Builder } from './builder'
 import { Slice } from './slice'
+
 import {
     hexToBits,
     hexToBytes,
@@ -12,10 +12,13 @@ import {
     bitsToBytes,
     bytesToBits
 } from '../utils/helpers'
+
 import {
+    Bit,
     augment,
     rollback
-} from '../utils/bits'
+} from '../types/bit'
+
 import { crc32cBytesLe } from '../utils/checksum'
 
 const REACH_BOC_MAGIC_PREFIX = hexToBytes('B5EE9C72')

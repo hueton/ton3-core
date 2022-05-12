@@ -1,7 +1,5 @@
 import { Bit } from './types/bit'
 import { BOC, Cell, Slice, Builder, Hashmap, HashmapE } from './boc'
-import { Address } from './address'
-import { Coins } from './coins'
 import * as Utils from './utils'
 import { bytesToHex, bytesToString, stringToBytes } from 'utils/helpers'
 

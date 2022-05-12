@@ -1,7 +1,6 @@
 import { Bit } from '../types/bit'
 import { Cell } from './cell'
-import { Coins } from '../coins'
-import { Address } from '../address'
+
 import {
     bitsToHex,
     bitsToInt8,
@@ -341,7 +340,7 @@ class Slice {
     }
 
     /**
-     * Read {@link Address} from {@link Slice}
+     * Read raw address from {@link Slice}
      *
      * @example
      * ```ts
@@ -358,15 +357,15 @@ class Slice {
      * // 'kf_8uRo6OBbQ97jCx2EIuKm8Wmt6Vb15-KsQHFLbKSMiYIny'
      * ```
      *
-     * @return {Address}
+     * @return {(string | null)}
      */
-    public loadAddress (): Address | null {
+    public loadAddress (): string | null {
         const FLAG_ADDRESS_NO = [ 0, 0 ]
         const FLAG_ADDRESS = [ 1, 0 ]
         const flag = this.preloadBits(2)
 
         if (flag.every((bit, i) => bit === FLAG_ADDRESS_NO[i])) {
-            return this.skip(2) && Address.NONE
+            return this.skip(2) && null
         }
 
         if (flag.every((bit, i) => bit === FLAG_ADDRESS[i])) {
@@ -381,7 +380,7 @@ class Slice {
             const hash = bitsToHex(bits.splice(2, 256))
             const raw = `${workchain}:${hash}`
 
-            return this.skip(size) && new Address(raw)
+            return this.skip(size) && raw
         }
 
         throw new Error('Slice: bad address flag bits.')
@@ -390,15 +389,15 @@ class Slice {
     /**
      * Same as .loadAddress() but will not mutate {@link Slice}
      *
-     * @return {Address}
+     * @return {(string | null)}
      */
-    public preloadAddress (): Address {
+    public preloadAddress (): string | null {
         const FLAG_ADDRESS_NO = [ 0, 0 ]
         const FLAG_ADDRESS = [ 1, 0 ]
         const flag = this.preloadBits(2)
 
         if (flag.every((bit, i) => bit === FLAG_ADDRESS_NO[i])) {
-            return Address.NONE
+            return null
         }
 
         if (flag.every((bit, i) => bit === FLAG_ADDRESS[i])) {
@@ -413,14 +412,14 @@ class Slice {
             const hash = bitsToHex(bits.splice(2, 256))
             const raw = `${workchain}:${hash}`
 
-            return new Address(raw)
+            return raw
         }
 
         throw new Error('Slice: bad address flag bits.')
     }
 
     /**
-     * Read {@link Coins} from {@link Slice}
+     * Read coins from {@link Slice}
      *
      * @example
      * ```ts
@@ -436,39 +435,39 @@ class Slice {
      * console.log(slice.loadCoins().toString()) // '100'
      * ```
      *
-     * @return {Coins}
+     * @return {number}
      */
-    public loadCoins (): Coins {
+    public loadCoins (): number {
         const length = this.preloadUint(4)
 
         if (length === 0) {
-            return this.skip(4) && new Coins(0)
+            return this.skip(4) && 0
         }
 
         const size = 4 + (length * 8)
         const bits = this.preloadBits(size)
         const hex = `0x${bitsToHex(bits.splice(4))}`
 
-        return this.skip(size) && new Coins(hex, true)
+        return this.skip(size) && Number(hex)
     }
 
     /**
      * Same as .loadCoins() but will not mutate {@link Slice}
      *
-     * @return {Coins}
+     * @return {number}
      */
-    public preloadCoins (): Coins {
+    public preloadCoins (): number {
         const length = this.preloadUint(4)
 
         if (length === 0) {
-            return new Coins(0)
+            return 0
         }
 
         const size = 4 + (length * 8)
         const bits = this.preloadBits(size)
         const hex = `0x${bitsToHex(bits.splice(4))}`
 
-        return new Coins(hex, true)
+        return Number(hex)
     }
 
     /**

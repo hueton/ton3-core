@@ -1,8 +1,7 @@
 import { Bit } from '../types/bit'
 import { Cell } from './cell'
 import { Slice } from './slice'
-import type { Address } from '../address'
-import type { Coins } from '../coins'
+
 import type { HashmapE } from './hashmap'
 import {
     bitsToBytes,
@@ -260,11 +259,12 @@ class Builder {
     /**
      * Store an {@link Address} in instance.
      *
-     * @param {(Address | null)} address - Smart contract address as {@link Address} or as null.
+     * @param {(Uint8Array | null)} address - Smart contract address hash or as null.
+     * @param {(number)} workchain - Smart contract workchain.
      *
      * @returns {this}
      */
-    public storeAddress (address: Address | null): this {
+    public storeAddress (address: Uint8Array | null, workchain: number): this {
         if (address === null) {
             this.storeBits([ 0, 0 ])
 
@@ -277,25 +277,25 @@ class Builder {
         this.checkBitsOverflow(addressBitsSize)
         this.storeBits([ 1, 0 ])
         this.storeUint(anycast, 1)
-        this.storeInt(address.workchain, 8)
-        this.storeBytes(address.hash)
+        this.storeInt(workchain, 8)
+        this.storeBytes(address)
 
         return this
     }
 
     /**
-     * Store a {@link Coins} in instance.
+     * Store a coins in instance.
      *
-     * @param {Coins} coins - Toncoin as {@link Coins}.
+     * @param {Coins} coins - Toncoin as number (nano).
      *
      * @returns {this}
      */
-    public storeCoins (coins: Coins): this {
-        if (coins.isNegative()) {
+    public storeCoins (coins: number): this {
+        if (coins < 0) {
             throw new Error('Builder: coins value can\'t be negative.')
         }
 
-        const nano = BigInt(coins.toNano())
+        const nano = BigInt(coins)
 
         this.storeVarUint(nano, 16)
 
