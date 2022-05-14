@@ -1,9 +1,14 @@
-import { Bit } from './types/bit'
-import { BOC, Cell, Slice, Builder, Hashmap, HashmapE } from './boc'
-import * as Utils from './utils'
-import { bytesToHex, bytesToString, stringToBytes } from 'utils/helpers'
+import { 
+    BOC,
+    Slice,
+    Builder
+} from './boc'
 
-const accountV3_initial_data = function(subwalletID: number, publicKey: Uint8Array): string {
+//
+// Wallet3
+//
+
+const createWallet3InitialData = function(subwalletID: number, publicKey: Uint8Array): string {
     const cell = new Builder()
         .storeUint(0, 32)
         .storeUint(subwalletID, 32)
@@ -12,26 +17,38 @@ const accountV3_initial_data = function(subwalletID: number, publicKey: Uint8Arr
     return BOC.toHexStandard(cell);
 };
 
-const accountV3_deploy_message = function(subwalletID: number, publicKey: Uint8Array): string {
-    const cell = new Builder()
-        .storeUint(this.subwalletId, 32)
+const createWallet3DeployMessageBody = function(subwalletID: number): string {
+    const body = new Builder()
+        .storeUint(subwalletID, 32)
         .storeInt(-1, 32) // valid until
         .storeUint(0, 32) // seqno
-        .cell();
-    return BOC.toHexStandard(cell);
+        .cell()
+
+    return BOC.toHexStandard(body);
 };
 
-const accountV3_address = function(code: string, data: string): string {
-    const cell = new Builder()
-        .storeBits([ 0, 0, 1, 1, 0 ])
-        .storeRef(BOC.fromStandard(code))
-        .storeRef(BOC.fromStandard(data))
-        .cell();
-    return `${cell.hash()}`;
-};
+// 
+// BOC
+//
+
+const createBOCHash = function(boc: string): string {
+    const cell = BOC.fromStandard(boc)
+    return cell.hash()
+} 
+
+const createBOCWithSignature = function(boc: string, signature: Uint8Array): string {
+    const cell = BOC.fromStandard(boc)
+    const signed = new Builder()
+        .storeBytes(signature)
+        .storeSlice(Slice.parse(cell))
+        .cell()
+    return BOC.toHexStandard(signed);
+}
 
 export { 
-    accountV3_initial_data,
-    accountV3_deploy_message,
-    accountV3_address
+    createWallet3InitialData,
+    createWallet3DeployMessageBody,
+
+    createBOCHash,
+    createBOCWithSignature
 }
