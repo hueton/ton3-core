@@ -109,6 +109,10 @@ class Cell {
         return sha256(bytes)
     }
 
+    public data (): string {
+        return bitsToHex(this._bits)
+    }
+
     public print (indent: string = ''): string {
         const bits = Array.from(this._bits)
         const areDivisible = bits.length % 4 === 0

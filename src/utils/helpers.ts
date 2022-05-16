@@ -1,4 +1,4 @@
-import { TON3BytesToString, TON3StringToBytes } from 'swiftyjs'
+import { TON3BytesToString, TON3StringToBytes, TON3BytesToBase64, TON3Base64ToBytes } from 'swiftyjs'
 import { Bit } from '../types/bit'
 
 const isNodeEnv = typeof process === 'object' && process.title === 'node'
@@ -94,20 +94,11 @@ const stringToBytes = (value: string): Uint8Array => {
 }
 
 const bytesToBase64 = (data: Uint8Array | number[]): string => {
-    const bytes = Array.from(data)
-    const str = String.fromCharCode(...bytes)
-
-    return isNodeEnv
-        ? Buffer.from(bytes).toString('base64')
-        : btoa(str)
+    return TON3BytesToBase64(data);
 }
 
 const base64ToBytes = (base64: string): Uint8Array => {
-    const binary = isNodeEnv
-        ? Buffer.from(base64, 'base64').toString('binary')
-        : atob(base64)
-
-    return Uint8Array.from(binary, char => char.charCodeAt(0))
+    return TON3Base64ToBytes(base64);
 }
 
 const sliceIntoChunks = (arr: any[], chunkSize: number): any[] => {
