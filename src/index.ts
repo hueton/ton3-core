@@ -19,8 +19,8 @@ const createWallet2InitialData = function(publicKey: Uint8Array): string {
 
 const createWallet2TransferMessageBody = function(seqno: number, timeout: number, bounceable: boolean, address: Uint8Array, workchain: number, amount: number, message: string | null): string {
     const body = new Builder()
-        .storeUint(timeout, 32) // valid until
         .storeUint(seqno, 32)
+        .storeUint(timeout, 32) // valid until
 
     const internalMessageBody = new Builder()
         .storeUint(0, 32)
