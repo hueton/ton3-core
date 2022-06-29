@@ -355,6 +355,17 @@ class Builder {
 
         return cell
     }
+
+    public fill (cell: Cell) {
+        if (this._bits.length > 0 || this._refs.length > 0) {
+            throw new Error('Builder: can\'t fill an Cell, because has an stored data.')
+        }
+
+        this._bits = Array.from(cell.bits)
+        this._refs = Array.from(cell.refs)
+
+        return this
+    }
 }
 
 export { Builder }

@@ -5,135 +5,65 @@ import {
     Builder
 } from './boc'
 import { TON3BytesToString } from 'swiftyjs'
-import { hexToBytes } from 'utils/helpers';
+import { hexToBytes, bytesToHex } from 'utils/helpers';
 
-//
-// Wallet2
-//
+class Builder3 extends Builder {
 
-const createWallet2InitialData = function(publicKey: Uint8Array): string {
-    const cell = new Builder()
-        .storeUint(0, 32)
-        .storeBytes(publicKey)
-        .cell();
-    return BOC.toHexStandard(cell);
-};
+    public boc(): string {
+        const cell = this.cell()
+        return BOC.toHexStandard(cell)
+    }
+}
 
-const createWallet2TransferMessageBody = function(seqno: number, timeout: number, bounceable: boolean, address: Uint8Array, workchain: number, amount: number, payload: string | null): string {
-    const body = new Builder()
-        .storeUint(seqno, 32)
-        .storeUint(timeout, 32) // valid until
-
+const transfer = function(message: Uint8Array, workchain: number, address: Uint8Array, amount: number, bounceable: boolean, payload?: Uint8Array, state?: Uint8Array): string {
     const internalMessage = new MessageInternal({
         bounce: bounceable,
         srcAddress: null,
         destAddress: address,
         destWorkchain: workchain,
         value: amount
-    }, createInternalMessageBody(payload))
+    }, internalMessagePayload(payload), internalMessageState(state))
 
-    // 3: default message send mode
-    body.storeUint(3, 8)
+    const externalMessage = new Builder()
+        .fill(BOC.fromStandard(bytesToHex(message)))
         .storeRef(internalMessage.cell())
+    
+    return BOC.toHexStandard(externalMessage.cell())
+}
 
-    return BOC.toHexStandard(body.cell());
-};
-
-//
-// Wallet3
-//
-
-const createWallet3InitialData = function(subwalletID: number, publicKey: Uint8Array): string {
-    const cell = new Builder()
-        .storeUint(0, 32)
-        .storeUint(subwalletID, 32)
-        .storeBytes(publicKey)
-        .cell();
-    return BOC.toHexStandard(cell);
-};
-
-const createWallet3TransferMessageBody = function(subwalletID: number, seqno: number, timeout: number, bounceable: boolean, address: Uint8Array, workchain: number, amount: number, payload: string | null): string {
-    const body = new Builder()
-        .storeUint(subwalletID, 32)
-        .storeUint(timeout, 32) // valid until
-        .storeUint(seqno, 32)
-
-    const internalMessage = new MessageInternal({
-        bounce: bounceable,
-        srcAddress: null,
-        destAddress: address,
-        destWorkchain: workchain,
-        value: amount
-    }, createInternalMessageBody(payload))
-
-    // 3: default message send mode
-    body.storeUint(3, 8)
-        .storeRef(internalMessage.cell())
-
-    return BOC.toHexStandard(body.cell());
-};
-
-//
-// Wallet4
-//
-
-const createWallet4InitialData = function(subwalletID: number, publicKey: Uint8Array): string {
-    const cell = new Builder()
-        .storeUint(0, 32)
-        .storeUint(subwalletID, 32)
-        .storeBytes(publicKey)
-        .storeBit(0)
-        .cell();
-    return BOC.toHexStandard(cell);
-};
-
-const createWallet4TransferMessageBody = function(subwalletID: number, seqno: number, timeout: number, bounceable: boolean, address: Uint8Array, workchain: number, amount: number, payload: string | null): string {
-    const body = new Builder()
-        .storeUint(subwalletID, 32)
-        .storeUint(timeout, 32) // valid until
-        .storeUint(seqno, 32)
-        .storeUint(0, 8) // op
-
-    const internalMessage = new MessageInternal({
-        bounce: bounceable,
-        srcAddress: null,
-        destAddress: address,
-        destWorkchain: workchain,
-        value: amount
-    }, createInternalMessageBody(payload))
-
-    // 3: default message send mode
-    body.storeUint(3, 8)
-        .storeRef(internalMessage.cell())
-
-    return BOC.toHexStandard(body.cell());
-};
-
-const createInternalMessageBody = function(payload: string | null): Cell {
-    let cell: Cell
+const internalMessagePayload = function(payload?: Uint8Array): Cell | null {
     if (!payload) {
-        cell = (new Builder()).cell()
-    } else {
-        try {
-            cell = BOC.fromStandard(payload)
-        } catch {
-            const bytes = hexToBytes(payload)
-            const string = TON3BytesToString(bytes)
+        return null;
+    }
 
-            const builder = new Builder()
-            if (string) {
-                cell = builder
-                .storeUint(0, 32)
-                .storeString(string)
-                .cell()
-            } else {
-                cell = builder
-                .storeBytes(bytes)
-                .cell()
-            }
+    let cell: Cell
+    try {
+        const hex = bytesToHex(payload)
+        cell = BOC.fromStandard(hex)
+    } catch {
+        const string = TON3BytesToString(payload)
+
+        const builder = new Builder()
+        if (string) {
+            cell = builder
+            .storeUint(0, 32)
+            .storeString(string)
+            .cell()
+        } else {
+            cell = builder
+            .storeBytes(payload)
+            .cell()
         }
     }
     return cell
+}
+
+const internalMessageState = function(state?: Uint8Array): Cell | null {
+    if (!state) {
+        return null;
+    }
+
+    return BOC.fromStandard(state)
 }
 
 // 
@@ -160,14 +90,8 @@ const getBOCRootCellData = function(boc: string): string {
 }
 
 export { 
-    createWallet2InitialData,
-    createWallet2TransferMessageBody,
-
-    createWallet3InitialData,
-    createWallet3TransferMessageBody,
-
-    createWallet4InitialData,
-    createWallet4TransferMessageBody,
+    Builder3,
+    transfer,
 
     createBOCHash,
     createBOCWithSignature,
