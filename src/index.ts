@@ -62,8 +62,9 @@ const internalMessageState = function(state?: Uint8Array): Cell | null {
     if (!state) {
         return null;
     }
-
-    return BOC.fromStandard(state)
+    
+    const hex = bytesToHex(state)
+    return BOC.fromStandard(hex)
 }
 
 // 
