@@ -9,6 +9,12 @@ import { hexToBytes, bytesToHex } from 'utils/helpers';
 
 class Builder3 extends Builder {
 
+    public storeBOCAsCellRef(boc: Uint8Array) {
+        const hex = bytesToHex(boc)
+        let cell = BOC.fromStandard(hex)
+        this.storeRef(cell)
+    }
+
     public boc(): string {
         const cell = this.cell()
         return BOC.toHexStandard(cell)
@@ -65,6 +71,23 @@ const internalMessageState = function(state?: Uint8Array): Cell | null {
     
     const hex = bytesToHex(state)
     return BOC.fromStandard(hex)
+}
+
+const initialConditionData = function(data: Uint8Array, code: Uint8Array): string {
+    const builder = new Builder()
+    builder.storeBit(0)
+    builder.storeBit(0)
+    builder.storeBit(1)
+    builder.storeBit(1)
+    builder.storeBit(0)
+
+    const codeHEX = bytesToHex(code)
+    builder.storeRef(BOC.fromStandard(codeHEX))
+
+    const dataHEX = bytesToHex(data)
+    builder.storeRef(BOC.fromStandard(dataHEX))
+
+    return builder.cell().hash()
 }
 
 // 
