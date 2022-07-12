@@ -7,6 +7,15 @@ import {
 import { TON3BytesToString } from 'swiftyjs'
 import { hexToBytes, bytesToHex } from 'utils/helpers';
 
+class Cell3 extends Cell {
+
+    constructor (boc: Uint8Array) {
+        const hex = bytesToHex(boc)
+        let cell = BOC.fromStandard(hex)
+        super(cell.bits, cell.refs, cell.exotic)
+    }
+}
+
 class Builder3 extends Builder {
 
     public boc(): string {
@@ -92,6 +101,7 @@ const getBOCRootCellData = function(boc: string): string {
 
 export { 
     Builder3,
+    Cell3,
     transfer,
 
     createBOCHash,
