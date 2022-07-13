@@ -2,7 +2,8 @@ import {
     BOC,
     Slice,
     Cell,
-    Builder
+    Builder,
+    HashmapE
 } from './boc'
 import { TON3BytesToString } from 'swiftyjs'
 import { hexToBytes, bytesToHex } from 'utils/helpers';
@@ -22,6 +23,13 @@ class Builder3 extends Builder {
         const cell = this.cell()
         return BOC.toHexStandard(cell)
     }
+}
+
+const address = function(boc: Uint8Array): string {
+    const hex = bytesToHex(boc)
+    const cell = BOC.fromStandard(hex)
+    const slice = Slice.parse(cell)
+    return slice.loadAddress()
 }
 
 const transfer = function(message: Uint8Array, workchain: number, address: Uint8Array, amount: number, bounceable: boolean, payload?: Uint8Array, state?: Uint8Array): string {
@@ -102,6 +110,8 @@ const getBOCRootCellData = function(boc: string): string {
 export { 
     Builder3,
     Cell3,
+
+    address,
     transfer,
 
     createBOCHash,
