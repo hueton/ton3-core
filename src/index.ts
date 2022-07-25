@@ -32,7 +32,7 @@ const address = function(boc: Uint8Array): string {
     return slice.loadAddress()
 }
 
-const initial = function(code: Uint8Array, data?: Uint8Array): Uint8Array {
+const initial = function(code: Uint8Array, data?: Uint8Array): string {
     const builder = new Builder()
 
     // split_depth: 0, ticktock: 0, code: 1
@@ -48,9 +48,7 @@ const initial = function(code: Uint8Array, data?: Uint8Array): Uint8Array {
     }
 
     builder.storeBit(0) // libraries
-    const cell = builder.cell()
-
-    return BOC.toBytesStandard(cell)
+    return BOC.toHexStandard(builder.cell())
 }
 
 const transfer = function(message: Uint8Array, workchain: number, address: Uint8Array, amount: number, bounceable: boolean, payload?: Uint8Array, state?: Uint8Array): string {
