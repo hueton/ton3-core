@@ -32,6 +32,27 @@ const address = function(boc: Uint8Array): string {
     return slice.loadAddress()
 }
 
+const initial = function(code: Uint8Array, data?: Uint8Array): Uint8Array {
+    const builder = new Builder()
+
+    // split_depth: 0, ticktock: 0, code: 1
+    builder.storeBits([ 0, 0, 1 ])
+    builder.storeRef(new Cell3(code))
+
+    if (data) {
+        builder
+            .storeBit(1) // data
+            .storeRef(new Cell3(data))
+    } else {
+        builder.storeBit(0) // data
+    }
+
+    builder.storeBit(0) // libraries
+    const cell = builder.cell()
+
+    return BOC.toBytesStandard(cell)
+}
+
 const transfer = function(message: Uint8Array, workchain: number, address: Uint8Array, amount: number, bounceable: boolean, payload?: Uint8Array, state?: Uint8Array): string {
     const internalMessage = new MessageInternal({
         bounce: bounceable,
@@ -112,6 +133,7 @@ export {
     Cell3,
 
     address,
+    initial,
     transfer,
 
     createBOCHash,
